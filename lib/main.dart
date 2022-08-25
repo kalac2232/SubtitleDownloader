@@ -11,8 +11,11 @@ import 'package:window_size/window_size.dart' as window_size;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (Platform.isWindows || Platform.isLinux) {
     window_size.setWindowFrame(Rect.fromLTRB(20,20,800,600));
+  }
+  if (Platform.isMacOS) {
+    window_size.setWindowFrame(Rect.fromLTRB(20,20,400,300));
   }
   runApp(MyApp());
 }
