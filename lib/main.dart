@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:r_dotted_line_border/r_dotted_line_border.dart';
 import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
-import 'package:dio/dio.dart';
 import 'package:subtitle_downloader/utils/file_util.dart';
 import 'package:subtitle_downloader/bean/movie_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -95,11 +94,6 @@ class _ExampleDragTargetState extends State<ExampleDragTarget> {
   bool _loading = false;
   final List<MovieFile> _list = [];
 
-  @override
-  void initState() {
-    print('parent initState');
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,13 +152,9 @@ class _ExampleDragTargetState extends State<ExampleDragTarget> {
       if (!FileUtil.isVideo(file.name)) {
         continue;
       }
-      var saveDir = File(file.path).parent;
-      print(saveDir);
 
-      //downloaderPresenter.start(fileName: file.name,saveDir: );
+      downloaderPresenter.start(fileName: FileUtil.getFileName(file.name),saveDir: File(file.path).parent);
     }
-
-
 
   }
 }

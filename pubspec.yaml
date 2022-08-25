@@ -33,6 +33,7 @@ dependencies:
   dio: ^4.0.6
   #desktop_window: ^0.4.0
   package_info_plus: ^1.4.3+1
+  html: ^0.15.0
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding

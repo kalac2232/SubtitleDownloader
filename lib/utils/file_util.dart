@@ -11,4 +11,14 @@ class FileUtil {
 
     return _videoSuffix.contains(split[split.length - 1]);
   }
+
+  static String getFileName(String file) {
+    var split = file.split(".");
+    // 文件名中没有.，无法提取出后缀
+    if (split.length < 2) {
+      return "";
+    }
+    return file.substring(0,file.lastIndexOf("."));
+  }
+
 }
