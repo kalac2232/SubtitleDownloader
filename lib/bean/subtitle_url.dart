@@ -1,6 +1,12 @@
 class SubtitleUrl {
   String name;
-  String url;
+  List<String> downloadUrls;
+  Map<String,String>? headers;
 
-  SubtitleUrl(this.name,this.url);
+  SubtitleUrl(this.name,this.downloadUrls,{this.headers});
+
+  @override
+  String toString() {
+    return "name: $name urls:$downloadUrls";
+  }
 }

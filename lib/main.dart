@@ -99,6 +99,7 @@ class _ExampleDragTargetState extends State<ExampleDragTarget> {
   Widget build(BuildContext context) {
     return DropTarget(
       onDragDone: (detail) {
+        _list.clear();
         setState(() {
           var iterator = detail.files.iterator;
           while (iterator.moveNext()) {
