@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:subtitle_downloader/utils/file_util.dart';
 
@@ -16,7 +17,9 @@ class DownloaderPresenter {
   }
   Dio dio = new Dio();
   Future<void> start({required String searchKey,required Directory saveDir}) async {
-    //dio.interceptors.add(LogInterceptor());
+
+    _openProxy();
+
     int successCount = 0;
     for(var d in downloaderList) {
       var searchResult = await d.search(searchKey);
@@ -86,5 +89,16 @@ class DownloaderPresenter {
 
     return Uri.decodeComponent(disposition.substring(index + 10,disposition.length -1));
 
+  }
+
+  void _openProxy() {
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+      client.findProxy = (uri) {
+        // proxy all request to localhost:8888
+        return "PROXY localhost:1088";
+      };
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    };
   }
 }
