@@ -92,14 +92,14 @@ class ExampleDragTarget extends StatefulWidget {
 class _ExampleDragTargetState extends State<ExampleDragTarget> {
   bool _dragging = false;
   bool _loading = false;
-  final List<MovieFile> _list = [];
 
 
   @override
   Widget build(BuildContext context) {
     return DropTarget(
+      // 拖拽完成回调
       onDragDone: (detail) {
-        _list.clear();
+        List<MovieFile> _list = [];
         setState(() {
           var iterator = detail.files.iterator;
           while (iterator.moveNext()) {
@@ -107,6 +107,7 @@ class _ExampleDragTargetState extends State<ExampleDragTarget> {
           }
           if( _list.isNotEmpty) {
             _loading = true;
+            // 开始查找字幕
             startSearchSubTitle(_list);
           }
         });
@@ -154,7 +155,7 @@ class _ExampleDragTargetState extends State<ExampleDragTarget> {
         continue;
       }
 
-      downloaderPresenter.start(fileName: FileUtil.getFileName(file.name),saveDir: File(file.path).parent);
+      downloaderPresenter.start(searchKey: FileUtil.getFileName(file.name),saveDir: File(file.path).parent);
     }
 
   }

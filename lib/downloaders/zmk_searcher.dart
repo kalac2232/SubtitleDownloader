@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
 
+/// zimuku
 class ZMKSearcher implements ISearcher{
   @override
   Future<List<SubtitleUrl>> search(String fileName) async {
@@ -17,6 +18,12 @@ class ZMKSearcher implements ISearcher{
     // 解析出字幕页url
     var document = parse(response.data);
     var elementsByClassName = document.body?.getElementsByClassName("tt clearfix");
+
+    if (elementsByClassName?.isEmpty == true) {
+      print("没有搜索到相关电影。");
+      return [];
+    }
+
     var subtitlePageUrl = elementsByClassName?.first.getElementsByTagName("a").first.attributes["href"];
 
     if (subtitlePageUrl?.isEmpty == true) {
@@ -37,6 +44,8 @@ class ZMKSearcher implements ISearcher{
       return [];
     }
 
+    print("开始解析字幕列表");
+    var currentTime = DateTime.now().millisecondsSinceEpoch;
     List<_ZMKSubtitle> zmkSubtitleList = [];
     // 解析出每个字幕的信息
     for (var tr in trTag) {
@@ -57,23 +66,39 @@ class ZMKSearcher implements ISearcher{
       print("没有查询到有效字幕。");
       return [];
     }
+    print("解析耗时 ${DateTime.now().millisecondsSinceEpoch - currentTime}ms ");
+
+    print("开始获取字幕下载地址");
+    currentTime = DateTime.now().millisecondsSinceEpoch;
+    List<Future> queue = [];
 
     // 通过id获取下载地址
     for (var sub in zmkSubtitleList) {
-      url = "https://zimuku.org/dld/${sub.id}.html";
-      response = await dio.post(url);
-      document = parse(response.data);
-      var aTags = document.getElementsByClassName("down clearfix").first.getElementsByTagName("a");
-      for (var aTag in aTags) {
 
-        var downloadUrl = aTag.attributes["href"];
-        if (downloadUrl != null) {
-          downloadUrl = "https://zimuku.org$downloadUrl";
-          sub.urls.add(downloadUrl);
-          sub.referer = url;
+      var future = Future(() async {
+
+        url = "https://zimuku.org/dld/${sub.id}.html";
+        response = await dio.post(url);
+        document = parse(response.data);
+        var aTags = document.getElementsByClassName("down clearfix").first.getElementsByTagName("a");
+        for (var aTag in aTags) {
+
+          var downloadUrl = aTag.attributes["href"];
+          if (downloadUrl != null) {
+            downloadUrl = "https://zimuku.org$downloadUrl";
+            sub.urls.add(downloadUrl);
+            // 后续下载时需要添加referer的请求头，否则无法下载
+            sub.referer = url;
+          }
         }
-      }
+      });
+
+      queue.add(future);
     }
+    await Future.wait(queue);
+
+
+    print("耗时 ${DateTime.now().millisecondsSinceEpoch - currentTime}ms ");
 
     // 组装为SubtitleUrl
     List<SubtitleUrl> results = [];
